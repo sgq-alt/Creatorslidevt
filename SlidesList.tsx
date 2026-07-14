@@ -4,9 +4,11 @@ import PresentationSelector from './components/PresentationSelector';
 import SlidesList from './components/SlidesList';
 import SlideWorkspace from './components/SlideWorkspace';
 import RightSidebar from './components/RightSidebar';
-import { Sparkles, Printer, FileDown, Layers, HelpCircle, Save, CheckCircle2, UserCheck, Play, X, ExternalLink, Loader2, AlertCircle } from 'lucide-react';
+import { Sparkles, Printer, FileDown, Download, Layers, HelpCircle, Save, CheckCircle2, UserCheck, Play, X, ExternalLink, Loader2, AlertCircle } from 'lucide-react';
 import { initAuth, googleSignIn, logout, isGoogleAuthReady } from './utils/googleAuth';
 import { exportToGoogleSheets } from './utils/googleSheetsExport';
+import { exportToPPTX } from './utils/pptxExport';
+import { getDefaultPresentations } from './utils/defaultData';
 
 const COLLABORATORS: Collaborator[] = [
   {
@@ -119,24 +121,56 @@ export default function App() {
     }
   };
 
-  // Fetch presentations from server
+  // Fetch presentations from server with robust local fallback
   const loadPresentations = async () => {
+    let loadedData: Presentation[] | null = null;
     try {
       const res = await fetch('/api/presentations');
       if (res.ok) {
-        const data = await res.json();
-        setPresentations(data);
-        if (data.length > 0) {
-          // Set initial active states
-          setActivePresId((prev) => prev || data[0].id);
-          if (data[0].slides && data[0].slides.length > 0) {
-            setActiveSlideId((prev) => prev || data[0].slides[0].id);
-          }
-        }
+        loadedData = await res.json();
+      } else {
+        console.warn('Servidor retornou erro ao carregar apresentações. Usando cache local.');
       }
     } catch (err) {
       console.error('Falha ao conectar com o servidor. Carregando dados locais.', err);
       setIsOffline(true);
+    }
+
+    if (loadedData && loadedData.length > 0) {
+      setPresentations(loadedData);
+      localStorage.setItem('slideai_all_presentations', JSON.stringify(loadedData));
+      
+      setActivePresId((prev) => prev || loadedData![0].id);
+      if (loadedData[0].slides && loadedData[0].slides.length > 0) {
+        setActiveSlideId((prev) => prev || loadedData[0].slides[0].id);
+      }
+    } else {
+      // Try loading from localStorage
+      const cached = localStorage.getItem('slideai_all_presentations');
+      if (cached) {
+        try {
+          const cachedData = JSON.parse(cached) as Presentation[];
+          if (cachedData.length > 0) {
+            setPresentations(cachedData);
+            setActivePresId((prev) => prev || cachedData[0].id);
+            if (cachedData[0].slides && cachedData[0].slides.length > 0) {
+              setActiveSlideId((prev) => prev || cachedData[0].slides[0].id);
+            }
+            return;
+          }
+        } catch (e) {
+          console.error('Erro ao fazer parse do cache local', e);
+        }
+      }
+
+      // No cache and no server response (or error) -> Load defaults!
+      const defaults = getDefaultPresentations();
+      setPresentations(defaults);
+      localStorage.setItem('slideai_all_presentations', JSON.stringify(defaults));
+      setActivePresId((prev) => prev || defaults[0].id);
+      if (defaults[0].slides && defaults[0].slides.length > 0) {
+        setActiveSlideId((prev) => prev || defaults[0].slides[0].id);
+      }
     }
   };
 
@@ -181,6 +215,7 @@ export default function App() {
         setOfflineQueue({});
         setHasPendingSync(false);
         setPresentations(result.data);
+        localStorage.setItem('slideai_all_presentations', JSON.stringify(result.data));
       }
     } catch (err) {
       console.error('Sync failed:', err);
@@ -190,9 +225,11 @@ export default function App() {
   // Save changes (with automatic server sync or offline queuing)
   const savePresentationState = useCallback(async (updatedPres: Presentation) => {
     // 1. Update React state locally
-    setPresentations((prev) =>
-      prev.map((p) => (p.id === updatedPres.id ? updatedPres : p))
-    );
+    setPresentations((prev) => {
+      const next = prev.map((p) => (p.id === updatedPres.id ? updatedPres : p));
+      localStorage.setItem('slideai_all_presentations', JSON.stringify(next));
+      return next;
+    });
 
     // 2. Persist to localStorage as robust safety backup
     localStorage.setItem(`slideai_pres_${updatedPres.id}`, JSON.stringify(updatedPres));
@@ -210,9 +247,11 @@ export default function App() {
         if (res.ok) {
           const freshData = await res.json();
           // Merge version history return from backend
-          setPresentations((prev) =>
-            prev.map((p) => (p.id === freshData.id ? freshData : p))
-          );
+          setPresentations((prev) => {
+            const next = prev.map((p) => (p.id === freshData.id ? freshData : p));
+            localStorage.setItem('slideai_all_presentations', JSON.stringify(next));
+            return next;
+          });
         }
       } catch (err) {
         console.warn('Network issue during save. Queuing for sync.', err);
@@ -234,14 +273,14 @@ export default function App() {
   };
 
   // Switch Theme
-  const handleChangeTheme = (themeId: 'beige' | 'blue' | 'green') => {
+  const handleChangeTheme = (themeId: 'beige' | 'blue' | 'green' | 'charcoal' | 'terracotta') => {
     if (!activePresentation) return;
     const updated = { ...activePresentation, themeId };
     savePresentationState(updated);
   };
 
   // Create new presentation from scratch
-  const handleCreatePresentation = (title: string, themeId: 'beige' | 'blue' | 'green', category: string) => {
+  const handleCreatePresentation = (title: string, themeId: 'beige' | 'blue' | 'green' | 'charcoal' | 'terracotta', category: string) => {
     const newPres: Presentation = {
       id: `pres_${Date.now()}`,
       title,
@@ -261,7 +300,11 @@ export default function App() {
       versions: [],
     };
 
-    setPresentations((prev) => [...prev, newPres]);
+    setPresentations((prev) => {
+      const next = [...prev, newPres];
+      localStorage.setItem('slideai_all_presentations', JSON.stringify(next));
+      return next;
+    });
     setActivePresId(newPres.id);
     setActiveSlideId(newPres.slides[0].id);
     savePresentationState(newPres);
@@ -271,6 +314,7 @@ export default function App() {
   const handleDeletePresentation = (id: string) => {
     const remaining = presentations.filter((p) => p.id !== id);
     setPresentations(remaining);
+    localStorage.setItem('slideai_all_presentations', JSON.stringify(remaining));
     if (remaining.length > 0) {
       setActivePresId(remaining[0].id);
       if (remaining[0].slides.length > 0) {
@@ -278,7 +322,7 @@ export default function App() {
       }
     }
     // Delete database item or sync
-    if (navigator.onLine) {
+    if (navigator.onLine && !isOffline) {
       fetch(`/api/presentations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -610,6 +654,16 @@ export default function App() {
           >
             <FileDown className="w-3.5 h-3.5" />
             <span>Exportar Planilha</span>
+          </button>
+
+          <button
+            onClick={() => activePresentation && exportToPPTX(activePresentation)}
+            className="px-4 py-1.5 bg-[#D95D39] text-white hover:bg-[#C24F2C] text-xs font-semibold rounded-md flex items-center gap-1.5 transition-all shadow-xs"
+            title="Baixar apresentação completa em formato PowerPoint (.pptx)"
+            disabled={!activePresentation}
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Baixar PowerPoint (PPTX)</span>
           </button>
 
           <button

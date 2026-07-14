@@ -5,12 +5,12 @@ import { Plus, Trash2, ArrowUp, ArrowDown, Layout, Palette } from 'lucide-react'
 interface SlidesListProps {
   slides: Slide[];
   activeSlideId: string;
-  themeId: 'beige' | 'blue' | 'green';
+  themeId: 'beige' | 'blue' | 'green' | 'charcoal' | 'terracotta';
   onSelectSlide: (id: string) => void;
   onAddSlide: (type: SlideType) => void;
   onDeleteSlide: (id: string) => void;
   onMoveSlide: (id: string, direction: 'up' | 'down') => void;
-  onChangeTheme: (themeId: 'beige' | 'blue' | 'green') => void;
+  onChangeTheme: (themeId: 'beige' | 'blue' | 'green' | 'charcoal' | 'terracotta') => void;
 }
 
 export default function SlidesList({
@@ -104,20 +104,21 @@ export default function SlidesList({
           <Palette className="w-4 h-4 text-[#2D5A82]" />
           <span>Esquema Visual (IA)</span>
         </div>
-        <div className="grid grid-cols-3 gap-1">
-          {(['beige', 'blue', 'green'] as const).map((tId) => (
+        <div className="grid grid-cols-5 gap-1">
+          {(['beige', 'blue', 'green', 'charcoal', 'terracotta'] as const).map((tId) => (
             <button
               key={tId}
               onClick={() => onChangeTheme(tId)}
-              className={`p-1.5 rounded-lg border text-center transition-all ${
+              className={`p-1 rounded border text-center transition-all ${
                 themeId === tId
                   ? 'border-[#4B6B4C] bg-[#FDFBF7] ring-1 ring-[#4B6B4C] font-bold'
                   : 'border-[#E8E2D6] bg-white hover:bg-[#F4F1EA]'
               }`}
+              title={THEMES[tId].name}
             >
               <div className={`w-full h-2.5 rounded-xs mb-1 ${THEMES[tId].background} border ${THEMES[tId].border}`} />
-              <span className="text-[9px] text-[#5C574F] font-semibold">
-                {tId === 'beige' ? 'Bege' : tId === 'blue' ? 'Azul' : 'Verde'}
+              <span className="text-[8px] text-[#5C574F] font-semibold block truncate">
+                {tId === 'beige' ? 'Bege' : tId === 'blue' ? 'Azul' : tId === 'green' ? 'Verde' : tId === 'charcoal' ? 'Escuro' : 'Terra'}
               </span>
             </button>
           ))}

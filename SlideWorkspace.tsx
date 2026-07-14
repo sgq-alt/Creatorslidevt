@@ -6,7 +6,7 @@ interface PresentationSelectorProps {
   presentations: Presentation[];
   activeId: string;
   onSelect: (id: string) => void;
-  onCreate: (title: string, themeId: 'beige' | 'blue' | 'green', category: string) => void;
+  onCreate: (title: string, themeId: 'beige' | 'blue' | 'green' | 'charcoal' | 'terracotta', category: string) => void;
   onDelete: (id: string) => void;
   onRename: (id: string, newTitle: string, newCategory: string) => void;
   isOffline: boolean;
@@ -27,7 +27,7 @@ export default function PresentationSelector({
 }: PresentationSelectorProps) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTitle, setNewTitle] = useState('');
-  const [newTheme, setNewTheme] = useState<'beige' | 'blue' | 'green'>('beige');
+  const [newTheme, setNewTheme] = useState<'beige' | 'blue' | 'green' | 'charcoal' | 'terracotta'>('beige');
   const [newCategory, setNewCategory] = useState('Geral');
   
   const [isEditing, setIsEditing] = useState(false);
@@ -212,27 +212,27 @@ export default function PresentationSelector({
 
               <div>
                 <label className="block text-[#5C574F] font-bold mb-1.5">Esquema de Cores Minimalista</label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setNewTheme('beige')}
-                    className={`p-3 rounded-lg border text-left transition-all ${
+                    className={`p-2.5 rounded-lg border text-left transition-all ${
                       newTheme === 'beige' ? 'border-[#4B6B4C] bg-[#FDFBF7] ring-1 ring-[#4B6B4C]' : 'border-[#E8E2D6] bg-white'
                     }`}
                   >
-                    <div className="w-full h-3 rounded bg-[#FDFBF7] border border-[#E8E2D6] mb-1.5" />
-                    <span className="font-bold text-[#333333] block text-[10px]">Areia</span>
+                    <div className="w-full h-3 rounded bg-[#FDFBF7] border border-[#E8E2D6] mb-1" />
+                    <span className="font-bold text-[#333333] block text-[10px]">Areia Minimalista</span>
                     <span className="text-[9px] text-[#8C857A]">Bege e Verde</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setNewTheme('blue')}
-                    className={`p-3 rounded-lg border text-left transition-all ${
+                    className={`p-2.5 rounded-lg border text-left transition-all ${
                       newTheme === 'blue' ? 'border-[#2D5A82] bg-[#F0F4F8] ring-1 ring-[#2D5A82]' : 'border-[#E8E2D6] bg-white'
                     }`}
                   >
-                    <div className="w-full h-3 rounded bg-[#F0F4F8] border border-[#C7D5E6] mb-1.5" />
+                    <div className="w-full h-3 rounded bg-[#F0F4F8] border border-[#C7D5E6] mb-1" />
                     <span className="font-bold text-[#1C2D42] block text-[10px]">Azul Prisma</span>
                     <span className="text-[9px] text-[#8C857A]">Tons de Azul</span>
                   </button>
@@ -240,13 +240,37 @@ export default function PresentationSelector({
                   <button
                     type="button"
                     onClick={() => setNewTheme('green')}
-                    className={`p-3 rounded-lg border text-left transition-all ${
+                    className={`p-2.5 rounded-lg border text-left transition-all ${
                       newTheme === 'green' ? 'border-[#4B6B4C] bg-[#F4F7F5] ring-1 ring-[#4B6B4C]' : 'border-[#E8E2D6] bg-white'
                     }`}
                   >
-                    <div className="w-full h-3 rounded bg-[#F4F7F5] border border-[#CAD6CE] mb-1.5" />
+                    <div className="w-full h-3 rounded bg-[#F4F7F5] border border-[#CAD6CE] mb-1" />
                     <span className="font-bold text-[#193224] block text-[10px]">Verde Floresta</span>
-                    <span className="text-[9px] text-[#8C857A]">Verde e Salvia</span>
+                    <span className="text-[9px] text-[#8C857A]">Verde e Sálvia</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewTheme('charcoal')}
+                    className={`p-2.5 rounded-lg border text-left transition-all ${
+                      newTheme === 'charcoal' ? 'border-[#10B981] bg-[#1E1E1E] ring-1 ring-[#10B981]' : 'border-[#E8E2D6] bg-white'
+                    }`}
+                  >
+                    <div className="w-full h-3 rounded bg-[#1E1E1E] border border-[#3E3E3E] mb-1" />
+                    <span className="font-bold text-[#F3F4F6] block text-[10px]">Carvão Tecnológico</span>
+                    <span className="text-[9px] text-[#8C857A]">Dark Industrial</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewTheme('terracotta')}
+                    className={`p-2.5 rounded-lg border text-left transition-all ${
+                      newTheme === 'terracotta' ? 'border-[#D95D39] bg-[#FFF9F5] ring-1 ring-[#D95D39]' : 'border-[#E8E2D6] bg-white'
+                    }`}
+                  >
+                    <div className="w-full h-3 rounded bg-[#FFF9F5] border border-[#F3D6C5] mb-1" />
+                    <span className="font-bold text-[#4A2D1F] block text-[10px]">Terracota Quente</span>
+                    <span className="text-[9px] text-[#8C857A]">Laranja e Argila</span>
                   </button>
                 </div>
               </div>

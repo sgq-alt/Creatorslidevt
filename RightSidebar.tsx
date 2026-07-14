@@ -72,7 +72,7 @@ export interface Comment {
 export interface Presentation {
   id: string;
   title: string;
-  themeId: 'beige' | 'blue' | 'green';
+  themeId: 'beige' | 'blue' | 'green' | 'charcoal' | 'terracotta';
   category: string;
   lastSaved: string;
   slides: Slide[];

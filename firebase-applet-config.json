@@ -1,11 +1,177 @@
-{
-  "projectId": "gen-lang-client-0651874102",
-  "appId": "1:275807238074:web:6f4ecadc96bb1b082e4f83",
-  "apiKey": "AIzaSyCoNcT640VDNQ1Aovisl6_IYq7xxSNfgoU",
-  "authDomain": "gen-lang-client-0651874102.firebaseapp.com",
-  "storageBucket": "gen-lang-client-0651874102.firebasestorage.app",
-  "messagingSenderId": "275807238074",
-  "measurementId": "",
-  "oAuthClientId": "275807238074-blrcntn9iu6t48e0kgdf801c040hldio.apps.googleusercontent.com",
-  "recaptchaSiteKey": ""
+import { Presentation } from '../types';
+
+export function getDefaultPresentations(): Presentation[] {
+  const now = new Date().toISOString();
+  return [
+    {
+      id: "pres_1",
+      title: "Resultados Q2 & Melhorias - Operação Têxtil",
+      themeId: "beige",
+      category: "Resultados Operacionais",
+      lastSaved: now,
+      slides: [
+        {
+          id: "slide_1_1",
+          type: "title",
+          title: "Resultados Q2 & Eficiência",
+          subtitle: "Indicadores, Melhorias e Plano de Ação - 2026",
+          content: "Apresentação executiva detalhando as métricas de produção, conquistas operacionais e as principais melhorias implementadas no último trimestre."
+        },
+        {
+          id: "slide_1_2",
+          type: "results",
+          title: "Indicadores Financeiros & Produtivos",
+          subtitle: "Destaques positivos do segundo trimestre",
+          content: "Consolidação de receitas e eficiência de processos operacionais com redução sistemática de perdas.",
+          metrics: [
+            { id: "m1", label: "Faturamento Líquido", value: "R$ 4.8M", change: "+14.2% vs Q1", trend: "up" },
+            { id: "m2", label: "Custo de Manutenção", value: "R$ 320k", change: "-8.5% vs Q1", trend: "up" },
+            { id: "m3", label: "OEE Global (Eficiência)", value: "82.4%", change: "+3.1% vs Q1", trend: "up" }
+          ]
+        },
+        {
+          id: "slide_1_3",
+          type: "indicators",
+          title: "Métricas de Qualidade & Entrega",
+          subtitle: "Acompanhamento detalhado dos principais KPIs operacionais",
+          content: "As taxas de refugo atingiram a meta mínima histórica graças aos novos sensores de calibração.",
+          bulletPoints: [
+            "Taxa de Conformidade de Produtos: 98.7% (Meta: 98.0%)",
+            "OTIF (On-Time In-Full): 95.4% de entregas perfeitas",
+            "Tempo Médio de Atendimento: Reduzido de 48h para 36h"
+          ],
+          metrics: [
+            { id: "m4", label: "Taxa de Refugo", value: "1.3%", change: "-0.5%", trend: "up" },
+            { id: "m5", label: "Reclamações Clientes", value: "4 chamados", change: "-50%", trend: "up" }
+          ]
+        },
+        {
+          id: "slide_1_4",
+          type: "improvements",
+          title: "Plano de Melhorias Implementadas",
+          subtitle: "Ações corretivas e preventivas executadas no período",
+          content: "Investimentos focados em automação e qualificação das equipes de operação de chão de fábrica.",
+          steps: [
+            { id: "s1", title: "Automação da Embalagem", description: "Instalação da nova seladora automática na Linha 3", status: "completed" },
+            { id: "s2", title: "Treinamento Lean Manufacturing", description: "Capacitação de 100% dos operadores em eliminação de desperdício", status: "completed" },
+            { id: "s3", title: "Predição de Falhas", description: "Sensores IoT nas extrusoras principais para alertas preventivos", status: "in_progress" }
+          ]
+        },
+        {
+          id: "slide_1_5",
+          type: "comparison",
+          title: "Análise Antes vs. Depois: Setup de Linha",
+          subtitle: "Resultados obtidos com a metodologia SMED",
+          content: "Comparativo prático da reestruturação do processo de troca de ferramentas nas injetoras de nylon.",
+          comparisons: [
+            { id: "c1", before: "Tempo de setup médio: 140 minutos por máquina", after: "Tempo reduzido para 45 minutos (economia de 68%)" },
+            { id: "c2", before: "Desperdício de 15kg de matéria-prima por troca", after: "Apenas 3kg de perdas de purga (redução de 80%)" },
+            { id: "c3", before: "Processo manual dependente de operador sênior", after: "Instrução de Trabalho Visual e ferramentas rápidas" }
+          ]
+        },
+        {
+          id: "slide_1_6",
+          type: "closing",
+          title: "Conclusões & Próximos Passos",
+          subtitle: "Foco estratégico para o próximo trimestre",
+          content: "Para o Q3, manteremos o foco na expansão das células IoT e consolidação dos ganhos de setup, visando margem operacional de 22%. Agradecemos a toda equipe pelo empenho!",
+          bulletPoints: [
+            "Concluir setup rápido nas linhas auxiliares",
+            "Homologar novos fornecedores regionais de insumos",
+            "Iniciar auditoria interna de certificação ISO 9001"
+          ]
+        }
+      ],
+      comments: [
+        {
+          id: "c_1",
+          slideId: "slide_1_2",
+          author: "Mariana (Gestora)",
+          avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
+          text: "Excelente resultado no faturamento líquido! Podemos incluir o valor do EBITDA se tivermos?",
+          timestamp: new Date(Date.now() - 3600000 * 2).toISOString()
+        },
+        {
+          id: "c_2",
+          slideId: "slide_1_4",
+          author: "Carlos (BI)",
+          avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
+          text: "A automação da Linha 3 já mostra economia real de energia. Parabéns!",
+          timestamp: new Date(Date.now() - 3600000).toISOString()
+        }
+      ],
+      versions: [
+        {
+          id: "v_1",
+          timestamp: new Date(Date.now() - 3600000 * 4).toISOString(),
+          description: "Versão Inicial Gerada",
+          author: "Sistema",
+          slides: []
+        }
+      ]
+    },
+    {
+      id: "pres_2",
+      title: "Plano de Eficiência Energética",
+      themeId: "green",
+      category: "Sustentabilidade",
+      lastSaved: now,
+      slides: [
+        {
+          id: "slide_2_1",
+          type: "title",
+          title: "Eficiência Energética & Sustentabilidade",
+          subtitle: "Redução de Pegada de Carbono e Custos de Utilidades",
+          content: "Projeto estratégico para mitigação de consumo de energia e implementação de matriz solar fotovoltaica."
+        },
+        {
+          id: "slide_2_2",
+          type: "results",
+          title: "Métricas Atuais de Consumo",
+          subtitle: "Panorama de custos e consumo por planta fabril",
+          content: "Diagnóstico inicial aponta alto consumo no horário de ponta.",
+          metrics: [
+            { id: "m2_1", label: "Consumo Médio", value: "142 MWh/mês", change: "+4.2% vs ano anterior", trend: "down" },
+            { id: "m2_2", label: "Custo Mensal", value: "R$ 89k", change: "Bandeira tarifária vermelha", trend: "down" }
+          ]
+        }
+      ],
+      comments: [],
+      versions: [
+        {
+          id: "v_2_1",
+          timestamp: now,
+          description: "Criação do rascunho de energia",
+          author: "Sistema",
+          slides: []
+        }
+      ]
+    },
+    {
+      id: "pres_3",
+      title: "Melhorias de Logística & Expedição",
+      themeId: "blue",
+      category: "Indicadores e Processos",
+      lastSaved: now,
+      slides: [
+        {
+          id: "slide_3_1",
+          type: "title",
+          title: "Otimização Logística",
+          subtitle: "Redução de Lead Time de Entrega",
+          content: "Análise de gargalos operacionais no fluxo de estocagem, paletização e carregamento."
+        }
+      ],
+      comments: [],
+      versions: [
+        {
+          id: "v_3_1",
+          timestamp: now,
+          description: "Rascunho inicial logística",
+          author: "Sistema",
+          slides: []
+        }
+      ]
+    }
+  ];
 }
