@@ -1,49 +1,82 @@
-import { SlideTheme } from '../types';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User } from 'firebase/auth';
+import firebaseConfig from '../../firebase-applet-config.json';
 
-export const THEMES: Record<'beige' | 'blue' | 'green' | 'charcoal' | 'terracotta', SlideTheme> = {
-  beige: {
-    id: 'beige',
-    name: 'Areia Minimalista (Natural Tones)',
-    background: 'bg-[#FDFBF7] text-[#333333]', // Warm off-white background, dark grey text
-    text: 'text-[#333333]',
-    accent: 'border-[#4B6B4C] text-[#4B6B4C] bg-[#FDFBF7]', // forest green border/text
-    secondary: 'bg-[#F4F1EA] border-[#E8E2D6]', // warm sand/beige card
-    border: 'border-[#E8E2D6]',
-  },
-  blue: {
-    id: 'blue',
-    name: 'Azul Prisma (Natural Tones)',
-    background: 'bg-[#F0F4F8] text-[#1C2D42]', // light blue-grey background
-    text: 'text-[#1C2D42]',
-    accent: 'border-[#2D5A82] text-[#2D5A82] bg-[#F0F4F8]', // prisma blue accent
-    secondary: 'bg-[#E1E7F0] border-[#C7D5E6]', // light blue card
-    border: 'border-[#C7D5E6]',
-  },
-  green: {
-    id: 'green',
-    name: 'Verde Floresta (Natural Tones)',
-    background: 'bg-[#F4F7F5] text-[#193224]', // light moss background
-    text: 'text-[#193224]',
-    accent: 'border-[#4B6B4C] text-[#4B6B4C] bg-[#FDFBF7]', // forest green accent
-    secondary: 'bg-[#E5EBE7] border-[#CAD6CE]', // light green card
-    border: 'border-[#CAD6CE]',
-  },
-  charcoal: {
-    id: 'charcoal',
-    name: 'Carvão Tecnológico (Elegant Dark)',
-    background: 'bg-[#1E1E1E] text-[#F3F4F6]', // dark charcoal background
-    text: 'text-[#F3F4F6]',
-    accent: 'border-[#10B981] text-[#10B981] bg-[#1E1E1E]', // neon emerald accent
-    secondary: 'bg-[#2D2D2D] border-[#3E3E3E]', // dark card
-    border: 'border-[#3E3E3E]',
-  },
-  terracotta: {
-    id: 'terracotta',
-    name: 'Terracota Quente (Warm Clay)',
-    background: 'bg-[#FFF9F5] text-[#4A2D1F]', // warm terracotta background
-    text: 'text-[#4A2D1F]',
-    accent: 'border-[#D95D39] text-[#D95D39] bg-[#FFF9F5]', // terracotta orange accent
-    secondary: 'bg-[#FCECE3] border-[#F3D6C5]', // soft terracotta card
-    border: 'border-[#F3D6C5]',
-  },
+const isConfigured = firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== 'placeholder';
+
+let auth: any = null;
+const provider = new GoogleAuthProvider();
+provider.addScope('https://www.googleapis.com/auth/spreadsheets');
+
+if (isConfigured) {
+  try {
+    const app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+  } catch (err) {
+    console.error('Failed to initialize Firebase Auth:', err);
+  }
+}
+
+let isSigningIn = false;
+let cachedAccessToken: string | null = null;
+
+export const isGoogleAuthReady = () => {
+  return isConfigured && auth !== null;
+};
+
+export const initAuth = (
+  onAuthSuccess?: (user: User, token: string) => void,
+  onAuthFailure?: () => void
+) => {
+  if (!isGoogleAuthReady()) {
+    if (onAuthFailure) onAuthFailure();
+    return () => {};
+  }
+
+  return onAuthStateChanged(auth, async (user: User | null) => {
+    if (user) {
+      if (cachedAccessToken) {
+        if (onAuthSuccess) onAuthSuccess(user, cachedAccessToken);
+      } else if (!isSigningIn) {
+        cachedAccessToken = null;
+        if (onAuthFailure) onAuthFailure();
+      }
+    } else {
+      cachedAccessToken = null;
+      if (onAuthFailure) onAuthFailure();
+    }
+  });
+};
+
+export const googleSignIn = async (): Promise<{ user: User; accessToken: string } | null> => {
+  if (!isGoogleAuthReady()) {
+    throw new Error('A integração com o Google não está configurada.');
+  }
+
+  try {
+    isSigningIn = true;
+    const result = await signInWithPopup(auth, provider);
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    if (!credential?.accessToken) {
+      throw new Error('Falha ao obter token de acesso do Google.');
+    }
+    cachedAccessToken = credential.accessToken;
+    return { user: result.user, accessToken: cachedAccessToken };
+  } catch (error: any) {
+    console.error('Sign in error:', error);
+    throw error;
+  } finally {
+    isSigningIn = false;
+  }
+};
+
+export const getAccessToken = async (): Promise<string | null> => {
+  return cachedAccessToken;
+};
+
+export const logout = async () => {
+  if (auth) {
+    await auth.signOut();
+  }
+  cachedAccessToken = null;
 };
